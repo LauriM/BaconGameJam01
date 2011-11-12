@@ -1,6 +1,6 @@
 playerX = 250;
 playerY = 250;
-playerSpeed = 5;
+playerSpeed = 7;
 
 BULLET_MAX_COUNT = 100;
 bulletAlive = {};
@@ -61,6 +61,14 @@ function updateBullets()
         if bulletAlive[i] == true then
             bulletX[i] = bulletX[i] + bulletSpeedX[i];
             bulletY[i] = bulletY[i] + bulletSpeedY[i];
+
+            if bulletY[i] < 0 then
+                bulletAlive[i] = false;
+            end
+
+            if bulletY[i] > 700 then --TODO: add the real end of the screen value that is correct
+                bulletAlive[i] = false;
+            end
         end
     end
 end
