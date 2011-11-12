@@ -144,13 +144,10 @@ function updateEnemies()
             enemyY[i] = enemyY[i] + speed;
 
             if enemyY[i] > 700 then
-                --ITS A KILL
+                --kill bots out of bounds
                 enemyAlive[i] = false;
 
                 playerPoints = playerPoints + 10;
-                for g=0,15 do
-                    particleCreate(enemyX[i],enemyY[i]);
-                end
             end
 
             --hit on the player
@@ -200,6 +197,11 @@ function updateBullets()
                 if enemyAlive[q] == true and enemyType[q] == 1 then
                     if pointCollisionCheck(bulletX[i],bulletY[i],enemyX[q],enemyY[q],20,20) == true then 
                         enemyAlive[q] = false;
+
+                        --its a kill on enemy
+                        for g=0,15 do
+                            particleCreate(enemyX[q],enemyY[q]);
+                        end
                     end
                 end
             end
@@ -284,7 +286,7 @@ end
 function particleCreate(x,y)
     for i=1,PARTICLE_MAX_COUNT do
         if particleLife[i] < 1 then
-            particleLife[i] = math.random(10,250);
+            particleLife[i] = math.random(100,250);
             particleX[i] = x;
             particleY[i] = y;
             particleSpeedX[i] = math.random(-5,5);
