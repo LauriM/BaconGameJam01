@@ -1,12 +1,14 @@
 angle = 0;
 
-gameState = 0; -- 0 = death, 1 = menu
+gameState = 0; -- 0 = death, 1 = game 
 
 playerX = 250;
 playerY = 250;
 playerSpeed = 7;
 playerTimer = 10;
 playerWeaponRate = 15;
+playerRage = 0;
+playerPoints = 0;
 
 BULLET_MAX_COUNT = 500;
 bulletAlive = {};
@@ -35,47 +37,62 @@ function love.load()
     img_bullet = love.graphics.newImage("bullet.png");
 
     music = love.audio.newSource("baconBeatingMusic.mp3",mp3);
-    love.audio.play(music);
+    gameState = 0;
 end
 
 function love.update(dt)
-    --framelimit
-    if dt < 1/60 then
-        love.timer.sleep(1000 * (1/30 - dt))
-    end
+    if gameState == 1 then
+        --framelimit
+        if dt < 1/60 then
+            love.timer.sleep(1000 * (1/30 - dt))
+        end
 
-    --input
-    if love.keyboard.isDown("right") then
-        playerX = playerX + playerSpeed;
-    end
+        --input
+        if love.keyboard.isDown("right") then
+            playerX = playerX + playerSpeed;
+        end
 
-    if love.keyboard.isDown("left") then
-        playerX = playerX - playerSpeed;
-    end
+        if love.keyboard.isDown("left") then
+            playerX = playerX - playerSpeed;
+        end
 
-    if love.keyboard.isDown("up") then
-        playerY = playerY - playerSpeed;
-    end
+        if love.keyboard.isDown("up") then
+            playerY = playerY - playerSpeed;
+        end
 
-    if love.keyboard.isDown("down") then
-        playerY = playerY + playerSpeed;
-    end
+        if love.keyboard.isDown("down") then
+            playerY = playerY + playerSpeed;
+        end
 
-    if love.keyboard.isDown(" ") then
-        playerTimer = playerTimer - 1;
-        if playerTimer < 0 then
-            createBullet(playerX + 10,playerY - 15,0,-7);
-            createBullet(playerX + 10,playerY - 15,5,-7);
-            createBullet(playerX + 10,playerY - 15,-5,-7);
-            playerTimer = playerWeaponRate;
+        if love.keyboard.isDown(" ") then
+            playerTimer = playerTimer - 1;
+            if playerTimer < 0 then
+                createBullet(playerX + 10,playerY - 15,0,-7);
+                createBullet(playerX + 10,playerY - 15,5,-7);
+                createBullet(playerX + 10,playerY - 15,-5,-7);
+                playerTimer = playerWeaponRate;
+            end
+        end
+
+        --update game
+
+        enemySpawner();
+        updateBullets();
+        updateEnemies();
+    else
+        if love.keyboard.isDown("n") then
+            --start the game
+            gameState = 1
+            --love.audio.play(music);
+
+            enemySpawnerBaseTime = 50;
+            enemySpawnerTime = 100;
+            enemySpawnerTimeRate = 1;
+            playerX = 250;
+            playerY = 500;
+            gameReset();
         end
     end
-
-    --update game
-
-    enemySpawner();
-    updateBullets();
-    updateEnemies();
 end
 
 function getAngle(x1,y1,x2,y2)
@@ -86,9 +103,16 @@ function getAngle(x1,y1,x2,y2)
 end
 
 function love.draw()
-    renderBullets();
-    renderEnemies();
-    love.graphics.draw(img_player,playerX,playerY);
+    if gameState == 1 then
+        renderBullets();
+        renderEnemies();
+        love.graphics.draw(img_player,playerX,playerY);
+        love.graphics.print("POINTS: " .. playerPoints, 0, 0);
+        love.graphics.print("RAGE: " .. playerRage, 0, 20);
+    else
+        love.graphics.print("PRESS 'n' TO START A NEW GAME", 150,150);
+
+    end
 end
 
 function updateEnemies()
@@ -107,7 +131,16 @@ function updateEnemies()
             enemyY[i] = enemyY[i] + speed;
 
             if enemyY[i] > 700 then
+                --ITS A KILL
                 enemyAlive[i] = false;
+
+                playerRage   = playerRage + 1;
+                playerPoints = playerPoints + 10;
+            end
+
+            --hit on the player
+            if pointCollisionCheck(playerX+10,playerY+10,enemyX[i],enemyY[i],20,20) == true then
+                gameState = 0
             end
         end
     end
@@ -219,4 +252,12 @@ function createEnemy(x,y,type_t)
     return 0;
 end
 
+function gameReset()
+    for i=1,ENEMY_MAX_COUNT do
+        enemyAlive[i] = false;
+    end
 
+    for i=1,BULLET_MAX_COUNT do
+        bulletAlive[i] = false;
+    end
+end
