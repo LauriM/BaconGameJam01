@@ -9,6 +9,10 @@ function love.load()
     playerSpeed = 5;
 
     BULLET_MAX_COUNT = 100;
+    bulletAlive = {};
+    bulletX = {};
+    bulletY = {};
+    message = "test";
 end
 
 function love.update(dt)
@@ -27,8 +31,36 @@ function love.update(dt)
     if love.keyboard.isDown("down") then
         playerY = playerY + playerSpeed;
     end
+
+    if love.keyboard.isDown(" ") then
+        createBullet(playerX + 10,playerY - 15);
+    end
 end
 
 function love.draw()
     love.graphics.draw(img_player,playerX,playerY);
+    renderBullets();
+    love.graphics.print(message,0,0);
+end
+
+function createBullet(x,y)
+    for i=1,BULLET_MAX_COUNT do
+        if bulletAlive[i] ~= false then 
+            bulletAlive[i] = true;
+            bulletX[i] = x;
+            bulletY[i] = y;
+            return 1;
+        end
+    end
+
+    return 0;
+end
+
+function renderBullets() 
+    for i=1,BULLET_MAX_COUNT do
+        if bulletAlive[i] == true then
+            love.graphics.draw(img_bullet,bulletX[i],bulletY[i]);
+            message = "blargh";
+        end
+    end
 end
