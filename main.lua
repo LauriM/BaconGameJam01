@@ -1,9 +1,12 @@
 angle = 0;
 
+gameState = 0; -- 0 = death, 1 = menu
+
 playerX = 250;
 playerY = 250;
 playerSpeed = 7;
 playerTimer = 10;
+playerWeaponRate = 15;
 
 BULLET_MAX_COUNT = 500;
 bulletAlive = {};
@@ -27,6 +30,7 @@ PI = 3.14159265
 function love.load()
     img_player = love.graphics.newImage("player.png");
     img_enemy1 = love.graphics.newImage("enemy1.png");
+    img_enemy2 = love.graphics.newImage("enemy2.png");
 
     img_bullet = love.graphics.newImage("bullet.png");
 
@@ -63,7 +67,7 @@ function love.update(dt)
             createBullet(playerX + 10,playerY - 15,0,-7);
             createBullet(playerX + 10,playerY - 15,5,-7);
             createBullet(playerX + 10,playerY - 15,-5,-7);
-            playerTimer = 10;
+            playerTimer = playerWeaponRate;
         end
     end
 
@@ -96,6 +100,10 @@ function updateEnemies()
                 speed = 5;
             end
 
+            if enemyType[i] == 2 then
+                speed = 9;
+            end
+
             enemyY[i] = enemyY[i] + speed;
 
             if enemyY[i] > 700 then
@@ -109,9 +117,19 @@ function enemySpawner()
     enemySpawnerTime = enemySpawnerTime - enemySpawnerTimeRate;
 
     if enemySpawnerTime < 0 then
+        num = math.random(1,6)
+
+        if num < 6 then
+            type = 1
+        end
+
+        if num > 5 and num < 7 then
+            type = 2
+        end
+
         enemySpawnerTime = enemySpawnerBaseTime;
         enemySpawnerBaseTime = enemySpawnerBaseTime - 100;
-        createEnemy(math.random(0,800),-10,1);
+        createEnemy(math.random(0,800),-10,type);
     end
 end
 
@@ -131,7 +149,7 @@ function updateBullets()
 
             --Collision on the ENEMIES THAT ARE EVIL AND BAD
             for q=1,ENEMY_MAX_COUNT do
-                if enemyAlive[q] == true then
+                if enemyAlive[q] == true and enemyType[q] == 1 then
                     if pointCollisionCheck(bulletX[i],bulletY[i],enemyX[q],enemyY[q],20,20) == true then 
                         enemyAlive[q] = false;
                     end
@@ -179,6 +197,10 @@ function renderEnemies()
         if enemyAlive[i] == true then
             if enemyType[i] == 1 then
                 love.graphics.draw(img_enemy1,enemyX[i],enemyY[i]);
+            end
+
+            if enemyType[i] == 2 then
+                love.graphics.draw(img_enemy2,enemyX[i],enemyY[i]);
             end
         end
     end
