@@ -1,4 +1,4 @@
-message = "test";
+angle = 0;
 
 playerX = 250;
 playerY = 250;
@@ -18,15 +18,20 @@ enemyType = {}
 enemyX = {}
 enemyY = {}
 
-enemySpawnerBaseTime = 100;
+enemySpawnerBaseTime = 50;
 enemySpawnerTime = 100;
 enemySpawnerTimeRate = 1;
+
+PI = 3.14159265
 
 function love.load()
     img_player = love.graphics.newImage("player.png");
     img_enemy1 = love.graphics.newImage("enemy1.png");
 
     img_bullet = love.graphics.newImage("bullet.png");
+
+    music = love.audio.newSource("baconBeatingMusic.mp3",mp3);
+    love.audio.play(music);
 end
 
 function love.update(dt)
@@ -56,7 +61,9 @@ function love.update(dt)
         playerTimer = playerTimer - 1;
         if playerTimer < 0 then
             createBullet(playerX + 10,playerY - 15,0,-7);
-            playerTimer = 5;
+            createBullet(playerX + 10,playerY - 15,5,-7);
+            createBullet(playerX + 10,playerY - 15,-5,-7);
+            playerTimer = 10;
         end
     end
 
@@ -67,9 +74,14 @@ function love.update(dt)
     updateEnemies();
 end
 
-function love.draw()
-    love.graphics.print(message,0,0);
+function getAngle(x1,y1,x2,y2)
+    radian = math.atan((x2-x1)/(y2-y1));
+    angle = (radian * (180 / PI));
 
+    return radian;
+end
+
+function love.draw()
     renderBullets();
     renderEnemies();
     love.graphics.draw(img_player,playerX,playerY);
@@ -97,7 +109,8 @@ function enemySpawner()
     enemySpawnerTime = enemySpawnerTime - enemySpawnerTimeRate;
 
     if enemySpawnerTime < 0 then
-        enemySpawnerBaseTime = 100;
+        enemySpawnerTime = enemySpawnerBaseTime;
+        enemySpawnerBaseTime = enemySpawnerBaseTime - 100;
         createEnemy(math.random(0,800),-10,1);
     end
 end
