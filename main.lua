@@ -38,6 +38,7 @@ PI = 3.14159265
 
 function love.load()
     img_player = love.graphics.newImage("player.png");
+    img_particle = love.graphics.newImage("particle.png");
     img_enemy1 = love.graphics.newImage("enemy1.png");
     img_enemy2 = love.graphics.newImage("enemy2.png");
 
@@ -282,12 +283,12 @@ end
 
 function particleCreate(x,y)
     for i=1,PARTICLE_MAX_COUNT do
-        if particleLife[i] > 0 then
-            particleLife[i] = math.random(10,25);
+        if particleLife[i] < 1 then
+            particleLife[i] = math.random(10,250);
             particleX[i] = x;
             particleY[i] = y;
-            particleSpeedX[i] = math.random(-50,50);
-            particleSpeedY[i] = math.random(-50,50);
+            particleSpeedX[i] = math.random(-5,5);
+            particleSpeedY[i] = math.random(-5,5);
             do return end
         end
     end
@@ -299,6 +300,7 @@ function renderParticles()
             particleLife[i] = particleLife[i] - 1;
             particleX[i] = particleX[i] + particleSpeedX[i];
             particleY[i] = particleY[i] + particleSpeedY[i];
+            love.graphics.draw(img_particle,particleX[i],particleY[i]);
         end
     end
 end
