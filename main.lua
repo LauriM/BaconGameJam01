@@ -17,7 +17,7 @@ bulletY = {};
 bulletSpeedX = {}
 bulletSpeedY = {}
 
-ENEMY_MAX_COUNT = 250;
+ENEMY_MAX_COUNT = 50;
 enemyAlive = {}
 enemyType = {}
 enemyX = {}
@@ -26,6 +26,13 @@ enemyY = {}
 enemySpawnerBaseTime = 50;
 enemySpawnerTime = 100;
 enemySpawnerTimeRate = 1;
+
+PARTICLE_MAX_COUNT = 500;
+particleLife = {}
+particleX = {}
+particleY = {}
+particleSpeedX = {}
+particleSpeedY = {}
 
 PI = 3.14159265
 
@@ -83,13 +90,15 @@ function love.update(dt)
         if love.keyboard.isDown("n") then
             --start the game
             gameState = 1
-            --love.audio.play(music);
+            love.audio.stop();
+            love.audio.play(music);
 
             enemySpawnerBaseTime = 50;
             enemySpawnerTime = 100;
             enemySpawnerTimeRate = 1;
             playerX = 250;
             playerY = 500;
+            playerPoints = 0;
             gameReset();
         end
     end
@@ -104,13 +113,16 @@ end
 
 function love.draw()
     if gameState == 1 then
+        renderParticles();
         renderBullets();
         renderEnemies();
         love.graphics.draw(img_player,playerX,playerY);
         love.graphics.print("POINTS: " .. playerPoints, 0, 0);
-        love.graphics.print("RAGE: " .. playerRage, 0, 20);
     else
         love.graphics.print("PRESS 'n' TO START A NEW GAME", 150,150);
+        if playerPoints > 0 then
+            love.graphics.print("Latest score: " .. playerPoints,150,180);
+        end
 
     end
 end
@@ -134,8 +146,10 @@ function updateEnemies()
                 --ITS A KILL
                 enemyAlive[i] = false;
 
-                playerRage   = playerRage + 1;
                 playerPoints = playerPoints + 10;
+                for g=0,15 do
+                    particleCreate(enemyX[i],enemyY[i]);
+                end
             end
 
             --hit on the player
@@ -259,5 +273,32 @@ function gameReset()
 
     for i=1,BULLET_MAX_COUNT do
         bulletAlive[i] = false;
+    end
+
+    for i=1,PARTICLE_MAX_COUNT do
+        particleLife[i] = -1;
+    end
+end
+
+function particleCreate(x,y)
+    for i=1,PARTICLE_MAX_COUNT do
+        if particleLife[i] > 0 then
+            particleLife[i] = math.random(10,25);
+            particleX[i] = x;
+            particleY[i] = y;
+            particleSpeedX[i] = math.random(-50,50);
+            particleSpeedY[i] = math.random(-50,50);
+            do return end
+        end
+    end
+end
+
+function renderParticles()
+    for i=1,PARTICLE_MAX_COUNT do
+        if particleLife[i] > 0 then
+            particleLife[i] = particleLife[i] - 1;
+            particleX[i] = particleX[i] + particleSpeedX[i];
+            particleY[i] = particleY[i] + particleSpeedY[i];
+        end
     end
 end
