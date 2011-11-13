@@ -182,7 +182,7 @@ function love.draw()
     else
         love.graphics.print("PRESS 'n' TO START A NEW GAME", 150,150);
         if playerPoints > 0 then
-            love.graphics.print("Latest score: " .. playerPoints,150,180);
+            love.graphics.print("Latest score: " .. playerPoints .. " (" .. round(endTime - startTime) .. "s)",150,180);
         end
 
         love.graphics.draw(img_player,150,200);
@@ -229,6 +229,7 @@ function updateEnemies()
             --hit on the player
             if pointCollisionCheck(playerX+10,playerY+10,enemyX[i],enemyY[i],20,20) == true then
                 gameState = 0
+                endTime = love.timer.getTime();
             end
         end
     end
