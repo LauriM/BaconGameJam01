@@ -1,6 +1,9 @@
-angle = 0;
-
 gameState = 0; -- 0 = death, 1 = game 
+
+enemyCount = 0;
+desiredEnemyCount = 50;
+desiredEnemyTypeMin = 1;
+desiredEnemyTypeMax = 1;
 
 playerX = 250;
 playerY = 250;
@@ -17,7 +20,7 @@ bulletY = {};
 bulletSpeedX = {}
 bulletSpeedY = {}
 
-ENEMY_MAX_COUNT = 50;
+ENEMY_MAX_COUNT = 500;
 enemyAlive = {}
 enemyType = {}
 enemyX = {}
@@ -36,6 +39,8 @@ particleSpeedY = {}
 
 PI = 3.14159265
 
+startTime = 0;
+
 function love.load()
     img_player = love.graphics.newImage("player.png");
     img_particle = love.graphics.newImage("particle.png");
@@ -53,6 +58,25 @@ function love.update(dt)
         --framelimit
         if dt < 1/60 then
             love.timer.sleep(1000 * (1/30 - dt))
+        end
+
+        --Base difficulty
+        time = getGameTime();--this prevents multitiple calculations of the time
+        desiredEnemyCount = time * 2;
+        desiredEnemyTypeMin = 1;
+        desiredEnemyTypeMax = 1;--only spawn type 1 by default
+
+        --special timings
+        if time > 3 and time < 10 then
+            desiredEnemyCount = 100;
+        end
+
+        if time > 27 and time < 35 then
+            desiredEnemyTypeMax = 2;
+        end
+
+        if  time > 44 and time < 50 then
+            desiredEnemyCount = 150;
         end
 
         --input
@@ -118,6 +142,8 @@ function love.update(dt)
             playerY = 500;
             playerPoints = 0;
             gameReset();
+
+            startTime = love.timer.getTime();
         end
     end
 end
@@ -136,6 +162,8 @@ function love.draw()
         renderEnemies();
         love.graphics.draw(img_player,playerX,playerY);
         love.graphics.print("POINTS: " .. playerPoints, 0, 0);
+        love.graphics.print("Time: " .. getGameTime() .. "s",0,20);
+        love.graphics.print("ENEMIESONSCREEN: " .. enemyCount,0,40);
     else
         love.graphics.print("PRESS 'n' TO START A NEW GAME", 150,150);
         if playerPoints > 0 then
@@ -145,11 +173,17 @@ function love.draw()
     end
 end
 
+function getGameTime()
+    return round(love.timer.getTime() - startTime,2);
+end
+
 function updateEnemies()
     speed = 0;
+    enemyCount = 0;
 
     for i=1,ENEMY_MAX_COUNT do
         if enemyAlive[i] == true then
+            enemyCount = enemyCount + 1;
             if enemyType[i] == 1 then
                 speed = 5;
             end
@@ -176,6 +210,10 @@ function updateEnemies()
 end
 
 function enemySpawner()
+    if enemyCount < desiredEnemyCount then
+        createEnemy(math.random(0,love.graphics.getWidth()),-10,math.random(desiredEnemyTypeMin,desiredEnemyTypeMax));
+    end
+    --[[
     enemySpawnerTime = enemySpawnerTime - enemySpawnerTimeRate;
 
     if enemySpawnerTime < 0 then
@@ -193,6 +231,7 @@ function enemySpawner()
         enemySpawnerBaseTime = enemySpawnerBaseTime - 100;
         createEnemy(math.random(0,800),-10,type);
     end
+    ]]--
 end
 
 function updateBullets()
@@ -322,4 +361,9 @@ function renderParticles()
             love.graphics.draw(img_particle,particleX[i],particleY[i]);
         end
     end
+end
+
+function round(number, decimal)
+	local multiplier = 10^(decimal or 0)
+	return math.floor(number * multiplier + 0.5) / multiplier
 end
