@@ -51,6 +51,8 @@ function love.load()
 
     music = love.audio.newSource("baconBeatingMusic.mp3",mp3);
     gameState = 0;
+
+    love.graphics.setCaption("REVENGE OF THE FLYING TRIANGLES OF DEATH");
 end
 
 function love.update(dt)
