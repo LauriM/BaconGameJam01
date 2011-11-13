@@ -170,6 +170,16 @@ function love.draw()
             love.graphics.print("Latest score: " .. playerPoints,150,180);
         end
 
+        love.graphics.draw(img_player,150,200);
+        love.graphics.print("You are this",180,200);
+
+        love.graphics.draw(img_enemy1,150,230);
+        love.graphics.print("Shoot these",180,230);
+
+        love.graphics.draw(img_enemy2,150,260);
+        love.graphics.print("Dodge these",180,260);
+
+        love.graphics.print("Arrows move, space shoots!",180,300);
     end
 end
 
