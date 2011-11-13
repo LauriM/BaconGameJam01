@@ -72,12 +72,29 @@ function love.update(dt)
             playerY = playerY + playerSpeed;
         end
 
+        if playerX < 0 then
+            playerX = 0
+        end
+
+        if playerX > love.graphics.getWidth() then
+            playerX = love.graphics.getWidth();
+        end
+
+        if playerY < 0 then
+            playerY = 0
+        end
+
+        if playerY > love.graphics.getHeight() then
+            playerY = love.graphics.getHeight();
+        end
+
         if love.keyboard.isDown(" ") then
             playerTimer = playerTimer - 1;
             if playerTimer < 0 then
-                createBullet(playerX + 10,playerY - 15,0,-7);
                 createBullet(playerX + 10,playerY - 15,5,-7);
+                createBullet(playerX + 10,playerY - 15,6,-7);
                 createBullet(playerX + 10,playerY - 15,-5,-7);
+                createBullet(playerX + 10,playerY - 15,-6,-7);
                 playerTimer = playerWeaponRate;
             end
         end
