@@ -79,6 +79,21 @@ function love.update(dt)
             desiredEnemyCount = 150;
         end
 
+        if time > 68 then
+            desiredEnemyTypeMin = -10
+            desiredEnemyTypeMax = 2
+        end
+
+        if time > 100 then
+            desiredEnemyTypeMin = -5
+            desiredEnemyTypeMax = 2
+        end
+
+        if time > 100 then
+            desiredEnemyTypeMin = 1
+            desiredEnemyTypeMax = 2
+        end
+
         --input
         if love.keyboard.isDown("right") then
             playerX = playerX + playerSpeed;
@@ -323,6 +338,9 @@ function renderEnemies()
 end
 
 function createEnemy(x,y,type_t)
+    if type_t < 1 then
+        type_t = 1;
+    end
     for i=1,ENEMY_MAX_COUNT do
         if enemyAlive[i] ~= true then 
             enemyAlive[i] = true;
